@@ -26,7 +26,7 @@ class HomePageTest(TestCase):
         self.assertIn(b'<title>To-Do lists</title>', response.content)
         self.assertTrue(response.content.endswith(b'</html>'))
 
-    def test_home_page_can_save_a_POST_request(self):  # TODO: Re-write this into two tests
+    def test_home_page_can_save_a_POST_request(self):
         """
         Test to make sure test entered gets saved
         """
@@ -40,10 +40,8 @@ class HomePageTest(TestCase):
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, 'A new list item')
 
-        self.assertIn('A new list item', response.content.decode())
-        expected_response = render(request, 'home.html',
-                                   {'new_item_text': 'A new list item'})
-        self.assertEqual(response.content.decode(), expected_response.content.decode())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
 
     def test_home_page_only_saves_items_when_necessary(self):
         request = HttpRequest()
