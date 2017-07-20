@@ -1,5 +1,7 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 import unittest
+
 
 class NewVisitorTest(unittest.TestCase):
 
@@ -17,15 +19,31 @@ class NewVisitorTest(unittest.TestCase):
 
         # Page title has 'To-Do' in the title
         self.assertIn('To-Do', self.browser.title)
-        self.fail('Finish the test!')
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
 
         # Asked to enter a to-do item straight away
+        input_box = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+            input_box.get_attribute('placeholder'),
+            'Enter a to-do item'
+        )
 
         # Types in first to-do
+        input_box.send_keys('Buy peacock feathers')
 
         # When Enter is hit, the page updates
+        input_box.send_keys(Keys.ENTER)
+
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_element_by_tag_name('tr')
+
+        self.assertTrue(
+            any(row.text == '1. Buy peacock feathers' for row in rows)
+        )
 
         # Another to-do prompt
+        self.fail('Finish the test!')
 
         # Page updates again and the page shows the last two items
 
