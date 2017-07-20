@@ -36,19 +36,24 @@ class NewVisitorTest(unittest.TestCase):
         input_box.send_keys(Keys.ENTER)
 
         table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_element_by_tag_name('tr')
+        rows = table.find_elements_by_tag_name('tr')
 
-        self.assertTrue(
-            any(row.text == '1. Buy peacock feathers' for row in rows),
-            "New to-do item did not appear in table"
-        )
+        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
 
         # Another to-do prompt
-        self.fail('Finish the test!')
+        input_box = self.browser.find_element_by_id('id_new_item')
+        input_box.send_keys('Use peacock feathers to make a fly')
+        input_box.send_keys(Keys.ENTER)
 
         # Page updates again and the page shows the last two items
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1. Buy peacock feathers', [row.text for row in rows])
+        self.assertIn('2. Use peacock feathers to make a fly',
+                      [row.text for row in rows])
 
         # The site has generated a unique URL for the user
+        self.fail('Finish the test!')
 
         # Visiting the URL takes the user to their to-do list
 
