@@ -58,11 +58,16 @@ class NewVisitorTest(LiveServerTestCase):
         self.check_for_row_in_list_table('2: Use peacock feathers to make a fly')
 
         # A second user starts a new list
-        input_box = self.browser.find_elements_by_id('id_new_item')
+        input_box = self.browser.find_element_by_id('id_new_item')
         input_box.send_keys('Buy milk')
         input_box.send_keys(Keys.ENTER)
 
+        # User 2 gets their own unique url
+        user2_list_url = self.browser.current_url
+        self.assertRegex(user2_list_url, '/lists/.+')
+        self.assertNotEqual(user1_list_url, user2_list_url)
+
         # No trace of user 1
-        page_text = self.browser.find_elements_by_tag_name('body').text
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
