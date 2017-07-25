@@ -3,7 +3,7 @@ from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
-
+import time
 
 class NewVisitorTest(LiveServerTestCase):
 
@@ -41,6 +41,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # When Enter is hit, the page updates
         input_box.send_keys(Keys.ENTER)
+        time.sleep(1)
         user1_list_url = self.browser.current_url
         self.assertRegex(user1_list_url, '/lists/.+')
 
@@ -48,6 +49,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # Another to-do prompt
         input_box = self.browser.find_element_by_id('id_new_item')
+        self.browser.implicitly_wait(3)
         input_box.send_keys('Use peacock feathers to make a fly')
         input_box.send_keys(Keys.ENTER)
 
@@ -71,6 +73,7 @@ class NewVisitorTest(LiveServerTestCase):
         input_box = self.browser.find_element_by_id('id_new_item')
         input_box.send_keys('Buy milk')
         input_box.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # User 2 gets their own unique url
         user2_list_url = self.browser.current_url
@@ -81,3 +84,24 @@ class NewVisitorTest(LiveServerTestCase):
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
+
+    def test_layout_and_styling(self):
+        # User 1 goes to the home page
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        # They see that the input box is centered
+        input_box = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            input_box.location['x'] + input_box.size['width'] / 2,
+            512,
+            delta=10
+        )
+
+        input_box.send_keys('testing\n')
+        input_box = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            input_box.location['x'] + input_box.size['width'] / 2,
+            512,
+            delta=10
+        )
